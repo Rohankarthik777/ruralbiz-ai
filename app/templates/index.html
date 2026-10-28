@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RuralBiz AI - Hyper-Local Business Advisory for Rural Micro-Entrepreneurs</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Marked.js (Markdown renderer) -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/styles.css">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rural: {
+              50: '#ecfdf5',
+              100: '#d1fae5',
+              600: '#059669',
+              700: '#047857',
+              800: '#065f46',
+              900: '#064e3b'
+            },
+            harvest: {
+              50: '#fffbeb',
+              500: '#f59e0b',
+              600: '#d97706',
+              700: '#b45309'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased">
+
+  <!-- ================= TOP NAVIGATION BAR ================= -->
+  <header class="glass-header sticky top-0 z-40 border-b border-slate-200 shadow-sm no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Brand & Title -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+          <div class="w-10 h-10 rounded-xl bg-rural-700 flex items-center justify-center text-white shadow-md shadow-rural-700/20">
+            <i class="fa-solid fa-wheat-awn text-xl text-harvest-500"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xl font-extrabold text-slate-900 tracking-tight" data-i18n="app_title">RuralBiz AI</span>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rural-100 text-rural-800 border border-rural-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-rural-600 inline-block mr-1 pulse-badge"></span>TAMIL NADU & RURAL INDIA
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 hidden sm:block truncate max-w-md" data-i18n="app_subtitle">
+              Hyper-Local Business Advisory & Financial Structuring Assistant
+            </p>
+          </div>
+        </div>
+
+        <!-- Right Action Controls -->
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          
+          <!-- Language Switcher -->
+          <button id="lang-toggle-btn" onclick="toggleLanguage()" class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-xs font-bold text-slate-700 transition flex items-center space-x-1.5 shadow-sm">
+            <i class="fa-solid fa-language text-rural-700"></i>
+            <span>தமிழ்</span>
+          </button>
+
+          <!-- Settings (Gemini API Key) -->
+          <button onclick="openSettingsModal()" class="p-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-sm shadow-sm transition" title="AI Settings / API Key">
+            <i class="fa-solid fa-sliders"></i>
+          </button>
+
+          <!-- Quick Demo Button -->
+          <button onclick="quickDemoLogin()" class="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg bg-harvest-50 text-harvest-700 border border-harvest-600/30 text-xs font-semibold hover:bg-harvest-500 hover:text-white transition shadow-sm" data-i18n="demo_btn">
+            <i class="fa-solid fa-bolt mr-1.5"></i> Quick Demo
+          </button>
+
+          <!-- User Badge / Auth Trigger -->
+          <div id="auth-actions">
+            <button onclick="openModal('auth-modal')" class="px-4 py-1.5 rounded-lg bg-rural-700 hover:bg-rural-800 text-white text-xs font-semibold shadow-sm transition flex items-center space-x-1.5" data-i18n="login_btn">
+              <i class="fa-solid fa-user-circle"></i>
+              <span>Login / Register</span>
+            </button>
+          </div>
+
+          <div id="user-badge" class="hidden flex items-center space-x-2 bg-rural-50 border border-rural-200 px-3 py-1 rounded-lg">
+            <div class="w-6 h-6 rounded-full bg-rural-700 text-white flex items-center justify-center text-xs font-bold">
+              <i class="fa-solid fa-user"></i>
+            </div>
+            <span id="user-name-display" class="text-xs font-bold text-rural-900 max-w-[120px] truncate">Muthuselvi</span>
+            <button onclick="handleLogout()" class="text-slate-400 hover:text-rose-600 text-xs ml-1" title="Logout">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Bar for All 9 Modules -->
+    <div class="border-t border-slate-200/80 bg-white/70 overflow-x-auto">
+      <div class="max-w-7xl mx-auto px-4 flex space-x-1 py-1.5 text-xs font-medium text-slate-600 whitespace-nowrap">
+        <button id="tab-dashboard" onclick="switchTab('dashboard')" class="nav-tab active px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span data-i18n="nav_dashboard">Overview</span>
+        </button>
+        <button id="tab-ideas" onclick="switchTab('ideas')" class="nav-tab px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5">
+          <i class="fa-solid fa-lightbulb"></i>
+          <span data-i18n="nav_ideas">AI Idea Generator</span>
+        </button>
+        <button id="tab-calculator" onclick="switchTab('calculator')" class="nav-tab px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5">
+          <i class="fa-solid fa-calculator"></i>
+          <span data-i18n="nav_calculator">Financial Calculator</span>
+        </button>
+        <button id="tab-cashbook" onclick="switchTab('cashbook')" class="nav-tab px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5">
+          <i class="fa-solid fa-book"></i>
+          <span data-i18n="nav_cashbook">Daily Cash Book</span>
+        </button>
+        <button id="tab-market" onclick="switchTab('market')" class="nav-tab px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5">
+          <i class="fa-solid fa-store"></i>
+          <span data-i18n="nav_market">Market Analysis</span>
+        </button>
+        <button id="tab-pricing" onclick="switchTab('pricing')" class="nav-tab px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5">
+          <i class="fa-solid fa-tags"></i>
+          <span data-i18n="nav_pricing">Smart Pricing</span>
+        </button>
+        <button id="tab-chatbot" onclick="switchTab('chatbot')" class="nav-tab px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5">
+          <i class="fa-solid fa-comments"></i>
+          <span data-i18n="nav_chatbot">Advisory Chatbot</span>
+        </button>
+        <button id="tab-plan" onclick="switchTab('plan')" class="nav-tab px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5">
+          <i class="fa-solid fa-file-contract"></i>
+          <span data-i18n="nav_plan">Business Plan</span>
+        </button>
+        <button id="tab-loan" onclick="switchTab('loan')" class="nav-tab px-3.5 py-1.5 rounded-lg flex items-center space-x-1.5">
+          <i class="fa-solid fa-hand-holding-dollar"></i>
+          <span data-i18n="nav_loan">Loan Readiness</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT PANELS ================= -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- 0. DASHBOARD OVERVIEW -->
+    <section id="panel-dashboard" class="tab-panel space-y-6">
+      
+      <!-- Welcome Banner -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-rural-800 via-rural-700 to-slate-900 text-white p-6 sm:p-8 shadow-md">
+        <div class="relative z-10 max-w-2xl">
+          <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/10 backdrop-blur-sm text-harvest-500 mb-3">
+            <i class="fa-solid fa-seedling mr-1"></i> கிராமப்புற வணிக முன்னேற்றம்
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight mb-2">
+            AI-Driven Hyper-Local Business Advisory & Financial Structuring
+          </h1>
+          <p class="text-rural-100 text-sm leading-relaxed mb-6">
+            Empowering rural micro-entrepreneurs in Tamil Nadu and India with AI business ideas, realistic financial calculators, cash book accounting, MUDRA loan readiness, and bilingual guidance.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <button onclick="switchTab('ideas')" class="px-4 py-2.5 rounded-xl bg-harvest-500 hover:bg-harvest-600 text-slate-900 font-bold text-xs shadow-md transition flex items-center space-x-2">
+              <i class="fa-solid fa-lightbulb"></i>
+              <span data-i18n="nav_ideas">AI Idea Generator</span>
+            </button>
+            <button onclick="switchTab('cashbook')" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs backdrop-blur-sm transition flex items-center space-x-2">
+              <i class="fa-solid fa-book"></i>
+              <span data-i18n="nav_cashbook">Daily Cash Book</span>
+            </button>
+            <button onclick="switchTab('loan')" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white font-semibold text-xs backdrop-blur-sm transition flex items-center space-x-2">
+              <i class="fa-solid fa-hand-holding-dollar"></i>
+              <span data-i18n="nav_loan">MUDRA Loan Assistant</span>
+            </button>
+          </div>
+        </div>
+        <div class="absolute -right-8 -bottom-10 opacity-15 text-white text-9xl pointer-events-none">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-wallet"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-500 font-medium" data-i18n="net_surplus">Net Cash in Hand</div>
+            <div id="dash-net-balance" class="text-xl font-extrabold text-slate-900">₹14,250</div>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-500 font-medium" data-i18n="res_monthly_rev">Monthly Revenue</div>
+            <div id="dash-month-income" class="text-xl font-extrabold text-slate-900">₹36,400</div>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-handshake"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-500 font-medium">Eligible Schemes</div>
+            <div class="text-xl font-extrabold text-slate-900">MUDRA & SVANidhi</div>
+          </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+          <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-comments"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-500 font-medium">AI Advisory</div>
+            <div class="text-xl font-extrabold text-slate-900">English & தமிழ்</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Grid: 9 Modules -->
+      <div>
+        <h2 class="text-lg font-bold text-slate-900 mb-4 flex items-center">
+          <i class="fa-solid fa-cubes-stacked text-rural-700 mr-2"></i> All 9 Core Business Modules
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <div onclick="switchTab('ideas')" class="feature-card cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3 text-lg font-bold">1</div>
+            <h3 class="font-bold text-slate-900 mb-1" data-i18n="ideas_heading">AI Business Idea Generator</h3>
+            <p class="text-xs text-slate-500" data-i18n="ideas_subheading">Tailored rural business suggestions based on budget, skills, and village location.</p>
+          </div>
+
+          <div onclick="switchTab('calculator')" class="feature-card cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3 text-lg font-bold">2</div>
+            <h3 class="font-bold text-slate-900 mb-1" data-i18n="calc_heading">Financial Planning Calculator</h3>
+            <p class="text-xs text-slate-500" data-i18n="calc_subheading">Daily & monthly profit forecasting, break-even days, and working capital buffer.</p>
+          </div>
+
+          <div onclick="switchTab('cashbook')" class="feature-card cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3 text-lg font-bold">3</div>
+            <h3 class="font-bold text-slate-900 mb-1" data-i18n="cashbook_heading">Daily Cash Book</h3>
+            <p class="text-xs text-slate-500" data-i18n="cashbook_subheading">Simple daily income/expense entry, UPI/Cash tracker, and one-click CSV export.</p>
+          </div>
+
+          <div onclick="switchTab('market')" class="feature-card cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3 text-lg font-bold">4</div>
+            <h3 class="font-bold text-slate-900 mb-1" data-i18n="market_heading">Hyper-Local Market Analysis</h3>
+            <p class="text-xs text-slate-500" data-i18n="market_subheading">Local customer segmentation, festival demand seasonality, and printable 10-point field survey.</p>
+          </div>
+
+          <div onclick="switchTab('pricing')" class="feature-card cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3 text-lg font-bold">5</div>
+            <h3 class="font-bold text-slate-900 mb-1" data-i18n="pricing_heading">Smart Pricing Assistant</h3>
+            <p class="text-xs text-slate-500" data-i18n="pricing_subheading">Unit cost calculator, markup percentages, and competitor comparison benchmarks.</p>
+          </div>
+
+          <div onclick="switchTab('chatbot')" class="feature-card cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3 text-lg font-bold">6</div>
+            <h3 class="font-bold text-slate-900 mb-1" data-i18n="chat_heading">AI Advisory Chatbot</h3>
+            <p class="text-xs text-slate-500" data-i18n="chat_subheading">Bilingual Tamil & English AI chatbot answering micro-business, marketing & finance questions.</p>
+          </div>
+
+          <div onclick="switchTab('plan')" class="feature-card cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3 text-lg font-bold">7</div>
+            <h3 class="font-bold text-slate-900 mb-1" data-i18n="plan_heading">Business Plan Generator</h3>
+            <p class="text-xs text-slate-500" data-i18n="plan_subheading">Structured 7-section bankable business plan with edit, save, and printable report export.</p>
+          </div>
+
+          <div onclick="switchTab('loan')" class="feature-card cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3 text-lg font-bold">8</div>
+            <h3 class="font-bold text-slate-900 mb-1" data-i18n="loan_heading">Microloan Readiness Assistant</h3>
+            <p class="text-xs text-slate-500" data-i18n="loan_subheading">Checklist of documents for MUDRA & SVANidhi, DSCR ratio, and banker approval score.</p>
+          </div>
+
+          <div onclick="openModal('auth-modal')" class="feature-card cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center mb-3 text-lg font-bold">9</div>
+            <h3 class="font-bold text-slate-900 mb-1">User Profile & Village Setup</h3>
+            <p class="text-xs text-slate-500">Secure credentials, village/district location, preferred language, and saved records.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. AI BUSINESS IDEA GENERATOR -->
+    <section id="panel-ideas" class="tab-panel hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="max-w-2xl">
+          <h2 class="text-xl font-bold text-slate-900 mb-1" data-i18n="ideas_heading">AI Business Idea Generator</h2>
+          <p class="text-sm text-slate-600 mb-6" data-i18n="ideas_subheading">
+            Discover tailored, high-margin rural micro-enterprises matching your budget, skills, and village location.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 bg-slate-50 p-5 rounded-xl border border-slate-200 mb-6">
+          
+          <!-- Budget Slider -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-600" data-i18n="budget_label">
+                Your Available Budget:
+              </label>
+              <span id="budget-display" class="text-sm font-extrabold text-emerald-700">₹ 25,000</span>
+            </div>
+            <input type="range" id="idea-budget-slider" min="5000" max="150000" step="5000" value="25000" class="w-full h-2 bg-slate-200 rounded-lg cursor-pointer" oninput="updateBudgetValue(this.value)" />
+            <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+              <span>₹5k (Micro)</span>
+              <span>₹50k</span>
+              <span>₹1.5L (Medium)</span>
+            </div>
+          </div>
+
+          <!-- Location Selection -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" data-i18n="location_label">
+              Village / Town Type:
+            </label>
+            <select id="idea-location-select" class="w-full text-sm bg-white border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600">
+              <option value="Village" data-i18n="loc_village">Rural Village (கிராமம்)</option>
+              <option value="Panchayat" data-i18n="loc_panchayat">Panchayat Union (ஊராட்சி ஒன்றியம்)</option>
+              <option value="Semi-Urban" data-i18n="loc_semiurban">Semi-Urban / Taluk Town (பேரூராட்சி / வட்டம்)</option>
+            </select>
+          </div>
+
+          <!-- Skills Selection -->
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2" data-i18n="skills_label">
+              Skills & Interests:
+            </label>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <label class="flex items-center"><input type="checkbox" value="Livestock" class="skill-checkbox rounded text-emerald-600 mr-1.5" checked> <span data-i18n="skill_livestock">Livestock / Poultry</span></label>
+              <label class="flex items-center"><input type="checkbox" value="Food" class="skill-checkbox rounded text-emerald-600 mr-1.5" checked> <span data-i18n="skill_food">Food & Snacks</span></label>
+              <label class="flex items-center"><input type="checkbox" value="Sewing" class="skill-checkbox rounded text-emerald-600 mr-1.5"> <span data-i18n="skill_sewing">Tailoring & Crafts</span></label>
+              <label class="flex items-center"><input type="checkbox" value="Machine" class="skill-checkbox rounded text-emerald-600 mr-1.5"> <span data-i18n="skill_machine">Agro Machinery</span></label>
+            </div>
+          </div>
+
+        </div>
+
+        <button id="generate-ideas-btn" onclick="runIdeaGenerator()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-sm shadow-md transition flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-wand-magic-sparkles text-harvest-500"></i>
+          <span data-i18n="btn_generate_ideas">Generate Viable Business Ideas</span>
+        </button>
+      </div>
+
+      <!-- Generated Results Container -->
+      <div id="ideas-result-container" class="space-y-4">
+        <!-- Filled dynamically by JavaScript -->
+      </div>
+    </section>
+
+    <!-- 2. FINANCIAL PLANNING CALCULATOR -->
+    <section id="panel-calculator" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Input Form -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-1">
+          <h2 class="text-lg font-bold text-slate-900 mb-1" data-i18n="calc_heading">Financial Planning Calculator</h2>
+          <p class="text-xs text-slate-500 mb-5" data-i18n="calc_subheading">Accurately compute daily income, monthly profitability, and break-even point.</p>
+
+          <form id="calc-form" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="calc_daily_sales">Expected Daily Sales Units</label>
+              <input type="number" id="calc-daily-units" value="30" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="calc_selling_price">Selling Price Per Unit (₹)</label>
+              <input type="number" id="calc-selling-price" value="120" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="calc_cost_unit">Cost Per Unit (COGS) (₹)</label>
+              <input type="number" id="calc-cost-unit" value="75" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="calc_daily_overhead">Daily Operating Cost (Electricity, Travel, Wages) (₹)</label>
+              <input type="number" id="calc-daily-operating" value="300" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="calc_startup_cost">Fixed Startup / Machinery Cost (₹)</label>
+              <input type="number" id="calc-startup-cost" value="35000" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="calc_buffer_days">Working Capital Reserve Days</label>
+              <input type="number" id="calc-working-days" value="30" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+            </div>
+            <button type="submit" class="w-full py-3 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-sm shadow-md transition" data-i18n="btn_calculate_finance">
+              Compute Financial Projections
+            </button>
+          </form>
+        </div>
+
+        <!-- Output Cards -->
+        <div id="calc-results-box" class="lg:col-span-2 space-y-4">
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <div class="text-xs text-slate-500" data-i18n="res_daily_rev">Daily Revenue</div>
+              <div id="res-daily-revenue" class="text-lg font-bold text-slate-900">₹3,600</div>
+              <div class="text-[10px] text-emerald-600 mt-1">Net: <span id="res-daily-profit" class="font-bold">₹1,050</span></div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <div class="text-xs text-slate-500" data-i18n="res_monthly_rev">Monthly Revenue (26 Days)</div>
+              <div id="res-monthly-revenue" class="text-lg font-bold text-slate-900">₹93,600</div>
+              <div class="text-[10px] text-emerald-600 mt-1">Net: <span id="res-monthly-profit" class="font-bold">₹27,300</span></div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <div class="text-xs text-slate-500" data-i18n="res_margin">Profit Margin</div>
+              <div id="res-profit-margin" class="text-lg font-bold text-emerald-700">29.2%</div>
+              <div class="text-[10px] text-slate-400 mt-1">Healthy rural margin</div>
+            </div>
+
+          </div>
+
+          <!-- Break-Even Analysis Section -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-900 text-sm mb-3 flex items-center">
+              <i class="fa-solid fa-scale-balanced text-rural-700 mr-2"></i> Break-Even Point Analysis
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <div class="text-xs text-slate-500" data-i18n="res_break_even_units">Monthly Units to Break Even</div>
+                <div id="res-breakeven-units" class="text-lg font-bold text-slate-800">173 units/mo</div>
+              </div>
+              <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <div class="text-xs text-slate-500" data-i18n="res_break_even_days">Days to Break Even Each Month</div>
+                <div id="res-breakeven-days" class="text-lg font-bold text-emerald-700">5.8 days</div>
+              </div>
+            </div>
+            
+            <div class="space-y-1">
+              <div class="flex justify-between text-xs text-slate-500">
+                <span>Month Start</span>
+                <span class="font-bold text-emerald-700">Break-Even Reached (Pure Profit Afterward)</span>
+                <span>Day 26</span>
+              </div>
+              <div class="w-full bg-slate-200 rounded-full h-2.5">
+                <div id="breakeven-progress-bar" class="bg-emerald-600 h-2.5 rounded-full" style="width: 25%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Capital Structure & Payback -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-900 text-sm mb-3 flex items-center">
+              <i class="fa-solid fa-vault text-rural-700 mr-2"></i> Working Capital & Payback Period
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                <div class="text-xs text-slate-600" data-i18n="res_working_capital">Working Capital Buffer</div>
+                <div id="res-working-capital" class="text-base font-extrabold text-emerald-800">₹76,500</div>
+                <div class="text-[10px] text-slate-500 mt-0.5">30-day raw material & expense pool</div>
+              </div>
+              <div class="p-3 bg-amber-50 rounded-lg border border-amber-100">
+                <div class="text-xs text-slate-600" data-i18n="res_total_capital">Total Capital Required</div>
+                <div id="res-total-capital" class="text-base font-extrabold text-amber-800">₹1,11,500</div>
+                <div class="text-[10px] text-slate-500 mt-0.5">Machinery + Working Buffer</div>
+              </div>
+              <div class="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <div class="text-xs text-slate-600" data-i18n="res_payback">Payback Period</div>
+                <div id="res-payback" class="text-base font-extrabold text-blue-800">4.1 Months</div>
+                <div class="text-[10px] text-slate-500 mt-0.5">Full capital recovered from net profits</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 3. DAILY CASH BOOK -->
+    <section id="panel-cashbook" class="tab-panel hidden space-y-6">
+      
+      <!-- Top Action Bar & Summary Stats -->
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900" data-i18n="cashbook_heading">Daily Cash Book & Financial Records</h2>
+          <p class="text-xs text-slate-500" data-i18n="cashbook_subheading">
+            Record everyday rural income & expenses, track cash vs digital payments, and download bank-ready reports.
+          </p>
+        </div>
+        <div class="flex items-center space-x-2">
+          <button onclick="exportCashbookCSV()" class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition flex items-center space-x-1.5" data-i18n="export_csv_btn">
+            <i class="fa-solid fa-file-csv text-emerald-700"></i>
+            <span>Download CSV</span>
+          </button>
+          <button onclick="openModal('txn-modal')" class="px-4 py-2 rounded-xl bg-rural-700 hover:bg-rural-800 text-white text-xs font-bold shadow-md transition flex items-center space-x-1.5" data-i18n="add_txn_btn">
+            <i class="fa-solid fa-plus"></i>
+            <span>Record New Transaction</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Financial Metric Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500" data-i18n="total_inflow">Total Income</div>
+          <div id="cb-total-inflow" class="text-lg font-bold text-emerald-700">₹0</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500" data-i18n="total_outflow">Total Expenses</div>
+          <div id="cb-total-outflow" class="text-lg font-bold text-rose-600">₹0</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500" data-i18n="net_surplus">Net Cash In Hand</div>
+          <div id="cb-net-surplus" class="text-lg font-bold text-slate-900">₹0</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500" data-i18n="weekly_income">7-Day Income</div>
+          <div id="cb-weekly-inflow" class="text-lg font-bold text-emerald-700">₹0</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs text-slate-500" data-i18n="weekly_expense">7-Day Expense</div>
+          <div id="cb-weekly-outflow" class="text-lg font-bold text-rose-600">₹0</div>
+        </div>
+      </div>
+
+      <!-- Chart.js Trend Visual -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 id="cashflow-chart-heading" class="font-bold text-slate-800 text-sm mb-3" data-i18n="cashflow_trend">14-Day Cash Flow Trend (Income vs Expense)</h3>
+        <div class="h-64 w-full">
+          <canvas id="cashflow-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- Transactions Filter & Table -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="font-bold text-slate-800 text-sm" data-i18n="recent_txns">Recent Transactions</h3>
+          <select id="cashbook-filter-type" onchange="loadCashbookData()" class="text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 focus:outline-emerald-600">
+            <option value="" data-i18n="filter_all">All Transactions</option>
+            <option value="income" data-i18n="filter_income">Income Only</option>
+            <option value="expense" data-i18n="filter_expense">Expense Only</option>
+          </select>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 text-[11px] font-bold uppercase text-slate-500 border-b border-slate-200">
+                <th class="py-3 px-4" data-i18n="th_date">Date</th>
+                <th class="py-3 px-4" data-i18n="th_type">Type</th>
+                <th class="py-3 px-4" data-i18n="th_category">Category</th>
+                <th class="py-3 px-4" data-i18n="th_amount">Amount</th>
+                <th class="py-3 px-4" data-i18n="th_mode">Payment Mode</th>
+                <th class="py-3 px-4" data-i18n="th_notes">Notes</th>
+                <th class="py-3 px-4 text-right" data-i18n="th_action">Action</th>
+              </tr>
+            </thead>
+            <tbody id="cashbook-tbody" class="divide-y divide-slate-100 text-sm">
+              <!-- Loaded via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 4. HYPER-LOCAL MARKET ANALYSIS -->
+    <section id="panel-market" class="tab-panel hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <h2 class="text-xl font-bold text-slate-900 mb-1" data-i18n="market_heading">Hyper-Local Market Analysis & Survey</h2>
+        <p class="text-sm text-slate-600 mb-6" data-i18n="market_subheading">
+          Analyze village buying patterns, harvest/festival seasonality curves, competitor pricing, and generate a 10-point field survey.
+        </p>
+
+        <form id="market-form" onsubmit="runMarketAnalysis(event)" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="input_biz_type">Business / Product Type</label>
+            <input type="text" id="market-biz-type" value="Millet Snacks & Flour Processing" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="input_village">Village / Town Name</label>
+            <input type="text" id="market-village" value="Alanganallur" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="input_district">District</label>
+            <input type="text" id="market-district" value="Madurai" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+          </div>
+          <div class="sm:col-span-3">
+            <button type="submit" id="market-analyze-btn" class="px-6 py-2.5 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-xs shadow-md transition" data-i18n="btn_analyze_market">
+              Run Market Analysis
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Results Container -->
+      <div id="market-results-box" class="space-y-6 hidden">
+        
+        <!-- Customer Segments -->
+        <div>
+          <h3 class="text-base font-bold text-slate-900 mb-3" data-i18n="tab_customers">Potential Local Customer Segments</h3>
+          <div id="market-segments-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        </div>
+
+        <!-- Seasonal Demand Curve -->
+        <div>
+          <h3 class="text-base font-bold text-slate-900 mb-3" data-i18n="tab_seasonal">Seasonal Demand Calendar (Tamil Nadu Festivals & Harvest)</h3>
+          <div id="market-seasonal-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+        </div>
+
+        <!-- Survey Questionnaire -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm print-area">
+          <div class="flex items-center justify-between mb-4 no-print">
+            <div>
+              <h3 class="text-base font-bold text-slate-900" data-i18n="tab_survey">10-Question Field Survey Questionnaire</h3>
+              <p class="text-xs text-slate-500">Ready to print or conduct directly with 25-30 villagers in your shandy or panchayat.</p>
+            </div>
+            <button onclick="printSurveyQuestionnaire()" class="px-3.5 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition flex items-center space-x-1.5" data-i18n="print_survey_btn">
+              <i class="fa-solid fa-print"></i>
+              <span>Print Questionnaire</span>
+            </button>
+          </div>
+          <div id="market-survey-container" class="space-y-3"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 5. SMART PRICING ASSISTANT -->
+    <section id="panel-pricing" class="tab-panel hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Pricing Inputs -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-1">
+          <h2 class="text-lg font-bold text-slate-900 mb-1" data-i18n="pricing_heading">Smart Pricing Assistant</h2>
+          <p class="text-xs text-slate-500 mb-5" data-i18n="pricing_subheading">Calculate true production costs, overhead allocation, and target markup.</p>
+
+          <form id="pricing-form" class="space-y-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="pricing_product_name">Product / Service Name</label>
+              <input type="text" id="price-product-name" value="Ragi Health Mix (500g)" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="cost_raw">Raw Materials Cost (₹)</label>
+              <input type="number" id="price-cost-raw" value="45" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="cost_labor">Direct Labor / Making (₹)</label>
+              <input type="number" id="price-cost-labor" value="15" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="cost_packaging">Packaging & Labelling (₹)</label>
+              <input type="number" id="price-cost-pkg" value="8" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="cost_utilities">Electricity & Fuel (₹)</label>
+              <input type="number" id="price-cost-util" value="4" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="cost_overhead">Overheads & Maintenance (₹)</label>
+              <input type="number" id="price-cost-ovh" value="3" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="target_margin">Target Profit Margin (%)</label>
+              <input type="number" id="price-target-margin" value="25" min="5" max="85" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="competitor_price">Local Market / Competitor Price (₹)</label>
+              <input type="number" id="price-competitor" value="115" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:outline-emerald-600">
+            </div>
+            <button type="submit" class="w-full py-2.5 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-xs shadow-md transition" data-i18n="btn_calculate_pricing">
+              Calculate Smart Price
+            </button>
+          </form>
+        </div>
+
+        <!-- Pricing Outputs -->
+        <div id="pricing-results-box" class="lg:col-span-2 space-y-4 hidden">
+          
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <div class="text-xs text-slate-500">Unit Cost (COGS)</div>
+              <div id="res-total-unit-cost" class="text-lg font-bold text-slate-800">₹75.00</div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <div class="text-xs text-slate-500" data-i18n="suggested_price">Suggested Price</div>
+              <div id="res-suggested-price" class="text-lg font-extrabold text-emerald-700">₹100.00</div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <div class="text-xs text-slate-500" data-i18n="profit_unit">Profit Per Unit</div>
+              <div id="res-profit-unit" class="text-lg font-bold text-emerald-600">+₹25.00</div>
+            </div>
+            <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <div class="text-xs text-slate-500" data-i18n="markup_label">Markup / Margin</div>
+              <div id="res-markup-pct" class="text-lg font-bold text-slate-800">33.3%</div>
+              <div class="text-[10px] text-slate-400">Margin: <span id="res-actual-margin">25%</span></div>
+            </div>
+          </div>
+
+          <!-- Price Strategy Tiers -->
+          <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-900 text-sm mb-3">Price Strategy Tiers</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 text-center">
+                <div class="text-xs text-slate-500" data-i18n="pricing_tier_penetration">Penetration (Low)</div>
+                <div id="tier-penetration" class="text-lg font-bold text-slate-800 my-1">₹86.25</div>
+                <div class="text-[10px] text-slate-400">15% markup for quick trial</div>
+              </div>
+              <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-200 text-center">
+                <div class="text-xs text-emerald-800 font-bold" data-i18n="pricing_tier_standard">Balanced (Recommended)</div>
+                <div id="tier-standard" class="text-xl font-extrabold text-emerald-700 my-1">₹100.00</div>
+                <div class="text-[10px] text-emerald-600 font-medium">Optimal rural sustainable profit</div>
+              </div>
+              <div class="p-3 bg-amber-50 rounded-lg border border-amber-200 text-center">
+                <div class="text-xs text-amber-800 font-bold" data-i18n="pricing_tier_premium">Festive / Premium</div>
+                <div id="tier-premium" class="text-lg font-bold text-amber-800 my-1">₹108.75</div>
+                <div class="text-[10px] text-slate-400">Pongal & wedding season demand</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Competitor Benchmarking -->
+          <div id="pricing-competitor-box" class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="font-bold text-slate-900 text-sm mb-2">Competitor Benchmark Comparison</h3>
+            <div class="flex items-center space-x-3 text-sm">
+              <span class="text-slate-600">Difference vs Market:</span>
+              <span id="comp-difference" class="font-bold text-slate-800">-₹15.00 (-13.0%)</span>
+            </div>
+            <p id="comp-verdict" class="text-xs text-slate-600 mt-2 bg-slate-50 p-2.5 rounded-lg border border-slate-200"></p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 6. AI BUSINESS ADVISORY CHATBOT -->
+    <section id="panel-chatbot" class="tab-panel hidden space-y-4">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-[700px] overflow-hidden">
+        
+        <!-- Chat Header -->
+        <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-full bg-rural-700 text-white flex items-center justify-center font-bold text-sm">
+              <i class="fa-solid fa-robot text-harvest-500"></i>
+            </div>
+            <div>
+              <h3 class="font-bold text-slate-900 text-sm" data-i18n="chat_heading">AI Business Advisory Chatbot</h3>
+              <p class="text-xs text-slate-500">Multilingual Rural Business & Micro-Finance Consultant (தமிழ் & English)</p>
+            </div>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>ONLINE
+            </span>
+          </div>
+        </div>
+
+        <!-- Chat Messages Container -->
+        <div id="chat-messages-container" class="flex-grow p-4 overflow-y-auto bg-slate-50/50 space-y-4">
+          
+          <div class="flex gap-3 justify-start">
+            <div class="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+              <i class="fa-solid fa-robot"></i>
+            </div>
+            <div class="max-w-[85%] bg-white border border-slate-200 text-slate-800 rounded-2xl rounded-tl-none px-4 py-3 shadow-sm text-sm leading-relaxed">
+              <p class="font-bold mb-1">வணக்கம்! / Welcome to RuralBiz AI Advisory.</p>
+              <p class="text-slate-600 mb-2">
+                I am your personal rural micro-business consultant. Ask me anything regarding starting a business, pricing products, applying for MUDRA bank loans, or managing daily cash flow in simple words.
+              </p>
+              <p class="text-xs text-slate-500 font-medium">
+                நீங்களும் தமிழில் கேள்விகள் கேட்கலாம்! (You can ask in English or தமிழ்).
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Quick Prompt Pills -->
+        <div id="quick-prompts-container" class="px-4 py-2 border-t border-slate-100 bg-white flex items-center space-x-2 overflow-x-auto text-xs">
+          <span class="text-slate-400 font-semibold flex-shrink-0" data-i18n="quick_prompts">Quick Prompts:</span>
+          <button onclick="sendQuickPrompt('What is MUDRA loan and how to apply?')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 whitespace-nowrap">
+            MUDRA Loan Guide
+          </button>
+          <button onclick="sendQuickPrompt('நாட்டுக்கோழி பண்ணை ஆரம்பிக்க என்ன தேவை?')" class="px-2.5 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 whitespace-nowrap font-medium">
+            நாட்டுக்கோழி வளர்ப்பு
+          </button>
+          <button onclick="sendQuickPrompt('How to calculate product price with 25% margin?')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 whitespace-nowrap">
+            Pricing Formula
+          </button>
+          <button onclick="sendQuickPrompt('What is working capital in simple terms?')" class="px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 whitespace-nowrap">
+            Working Capital
+          </button>
+        </div>
+
+        <!-- Chat Input Form -->
+        <form id="chat-form" class="p-4 border-t border-slate-200 bg-white flex items-center space-x-2">
+          <input type="text" id="chat-input" class="flex-grow text-sm border border-slate-300 rounded-xl px-4 py-2.5 focus:outline-emerald-600" placeholder="Ask a business question in English or தமிழ்..." required>
+          <button type="submit" class="px-5 py-2.5 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-xs shadow-md transition flex items-center space-x-1.5">
+            <span data-i18n="chat_send">Send</span>
+            <i class="fa-solid fa-paper-plane text-xs"></i>
+          </button>
+        </form>
+
+      </div>
+    </section>
+
+    <!-- 7. BUSINESS PLAN GENERATOR -->
+    <section id="panel-plan" class="tab-panel hidden space-y-6">
+      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm no-print">
+        <h2 class="text-xl font-bold text-slate-900 mb-1" data-i18n="plan_heading">Business Plan Generator</h2>
+        <p class="text-sm text-slate-600 mb-6" data-i18n="plan_subheading">
+          Create a formal, bank-ready 7-section project report for bank managers, government schemes, or personal roadmap.
+        </p>
+
+        <form id="plan-form" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="plan_biz_title">Proposed Business Name</label>
+            <input type="text" id="plan-input-title" value="Marutham Natural Cold-Pressed Oil" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="plan_category">Business Category</label>
+            <input type="text" id="plan-input-category" value="Agro-Processing & Edible Oils" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="plan_location">Location & District</label>
+            <input type="text" id="plan-input-location" value="Alanganallur, Madurai" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="plan_investment">Total Proposed Investment (₹)</label>
+            <input type="number" id="plan-input-investment" value="75000" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="plan_sales_target">Expected Monthly Sales Target (₹)</label>
+            <input type="number" id="plan-input-sales" value="85000" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+          </div>
+          <div class="flex items-end">
+            <button type="submit" id="plan-generate-btn" class="w-full py-2.5 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-xs shadow-md transition" data-i18n="btn_generate_plan">
+              Generate Full Business Plan
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Generated Business Plan Report -->
+      <div id="plan-results-box" class="space-y-4 hidden print-area">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <span class="inline-block px-2.5 py-0.5 rounded text-[10px] font-bold bg-rural-100 text-rural-800 mb-1 uppercase">Official Project Report</span>
+            <h3 id="plan-display-title" class="text-2xl font-extrabold text-slate-900">Marutham Natural Cold-Pressed Oil</h3>
+            <p id="plan-display-meta" class="text-xs text-slate-500 mt-1"></p>
+          </div>
+          <div class="flex items-center space-x-2 no-print">
+            <button onclick="saveCurrentBusinessPlan()" class="px-4 py-2 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs font-bold transition flex items-center space-x-1.5" data-i18n="btn_save_plan">
+              <i class="fa-solid fa-floppy-disk"></i>
+              <span>Save Plan</span>
+            </button>
+            <button onclick="printBusinessPlan()" class="px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold transition flex items-center space-x-1.5" data-i18n="btn_print_plan">
+              <i class="fa-solid fa-print"></i>
+              <span>Print / Export PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="plan-sections-container" class="space-y-4">
+          <!-- Rendered 7 sections with editable textareas -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. MICROLOAN READINESS ASSISTANT -->
+    <section id="panel-loan" class="tab-panel hidden space-y-6">
+      
+      <!-- Loan Header & Form -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-1">
+          <h2 class="text-lg font-bold text-slate-900 mb-1" data-i18n="loan_heading">Microloan Readiness Assistant</h2>
+          <p class="text-xs text-slate-500 mb-5" data-i18n="loan_subheading">
+            Assess your loan eligibility for MUDRA, PM SVANidhi, and SHG schemes. Check your documents and calculate bank approval score.
+          </p>
+
+          <form id="loan-form" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="loan_requested">Requested Loan Amount (₹)</label>
+              <input type="number" id="loan-input-amount" value="50000" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="loan_monthly_profit">Estimated Monthly Business Profit (₹)</label>
+              <input type="number" id="loan-input-profit" value="18000" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="loan_existing_emi">Existing Monthly Loan EMI (if any) (₹)</label>
+              <input type="number" id="loan-input-emi" value="0" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600">
+            </div>
+
+            <!-- Documents Checkbox Section -->
+            <div>
+              <div class="flex justify-between items-center mb-2">
+                <label class="text-xs font-bold uppercase tracking-wider text-slate-600" data-i18n="docs_heading">
+                  Required Documents Checklist
+                </label>
+                <span id="docs-count-badge" class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">6 / 8 Ready</span>
+              </div>
+              <div id="loan-checklist-container" class="space-y-2 max-h-56 overflow-y-auto pr-1">
+                <!-- Loaded via JavaScript -->
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-3 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-sm shadow-md transition" data-i18n="btn_assess_loan">
+              Check Loan Readiness Score
+            </button>
+          </form>
+        </div>
+
+        <!-- Readiness Score Results & Schemes -->
+        <div class="lg:col-span-2 space-y-6">
+          
+          <!-- Assessment Results Box -->
+          <div id="loan-results-box" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <span class="text-xs text-slate-500 uppercase tracking-wider font-semibold" data-i18n="score_label">Banker Readiness Score</span>
+                <div id="res-loan-score" class="text-3xl font-extrabold text-slate-900 mt-1">85 / 100</div>
+                <div id="res-loan-grade" class="text-xs font-bold text-emerald-700 mt-0.5">High Approval Likelihood</div>
+              </div>
+              <div class="text-right">
+                <div class="text-xs text-slate-500" data-i18n="emi_est">Estimated Monthly EMI (3 Yrs @ 9%)</div>
+                <div id="res-loan-emi" class="text-xl font-bold text-slate-800">₹1,590</div>
+                <div class="text-xs text-slate-500 mt-0.5">DSCR: <span id="res-dscr-ratio" class="font-bold text-emerald-700">11.3x</span></div>
+              </div>
+            </div>
+
+            <div class="w-full bg-slate-200 rounded-full h-3">
+              <div id="loan-score-bar" class="bg-emerald-600 h-3 rounded-full" style="width: 85%"></div>
+            </div>
+
+            <div class="p-3.5 bg-emerald-50 rounded-xl border border-emerald-100 flex items-start space-x-3">
+              <i class="fa-solid fa-stamp text-emerald-700 text-lg mt-0.5"></i>
+              <div>
+                <div class="text-xs font-bold text-emerald-900 uppercase tracking-wider">Bank Manager's Feasibility Verdict</div>
+                <p id="res-banker-verdict" class="text-xs text-emerald-800 mt-0.5 leading-relaxed">
+                  Your project is highly bankable! You meet all mandatory document requirements and have a strong surplus to service monthly EMIs with ease.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Government Micro-Credit Schemes Catalog -->
+          <div>
+            <h3 class="text-base font-bold text-slate-900 mb-3" data-i18n="schemes_heading">
+              Eligible Government Micro-Credit Schemes
+            </h3>
+            <div id="loan-schemes-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <!-- Rendered via JavaScript -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ================= MODALS ================= -->
+
+  <!-- 1. Authentication Modal (Login & Registration) -->
+  <div id="auth-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeModal('auth-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Tabs -->
+      <div class="flex border-b border-slate-200 mb-4 text-sm">
+        <button id="auth-tab-login" onclick="toggleAuthTab('login')" class="flex-1 py-2 text-center text-emerald-700 border-b-2 border-emerald-700 font-bold">
+          Login (உள்நுழை)
+        </button>
+        <button id="auth-tab-reg" onclick="toggleAuthTab('register')" class="flex-1 py-2 text-center text-slate-500">
+          Register (புதிய பதிவு)
+        </button>
+      </div>
+
+      <div id="auth-error" class="hidden p-3 bg-rose-50 text-rose-700 text-xs rounded-lg mb-3"></div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Username / Phone</label>
+          <input type="text" id="login-username" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" placeholder="e.g. demo_entrepreneur" required>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+          <input type="password" id="login-password" class="w-full text-sm border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" required>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-xs shadow-md transition">
+          Sign In
+        </button>
+        <div class="text-center pt-2">
+          <button type="button" onclick="quickDemoLogin()" class="text-xs text-harvest-600 font-semibold hover:underline">
+            Or Sign in with Demo Account (முத்துச்செல்வி)
+          </button>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="reg-form" class="space-y-2.5 hidden">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-0.5">Full Name (பெயர்)</label>
+          <input type="text" id="reg-fullname" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" placeholder="e.g. Selvam Murugan" required>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-0.5">Username (பயனர் பெயர்)</label>
+          <input type="text" id="reg-username" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" placeholder="e.g. selvam2026" required>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-0.5">Password (கடவுச்சொல்)</label>
+          <input type="password" id="reg-password" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" required>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-0.5">Mobile Phone</label>
+            <input type="tel" id="reg-phone" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" placeholder="9876543210">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-0.5">Village / Town</label>
+            <input type="text" id="reg-village" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" placeholder="Alanganallur">
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-0.5">District (மாவட்டம்)</label>
+            <input type="text" id="reg-district" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" placeholder="Madurai">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-0.5">Business Type</label>
+            <input type="text" id="reg-biztype" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" placeholder="Poultry / Food / Tailoring">
+          </div>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-xs shadow-md transition mt-2">
+          Create Account (பதிவு செய்)
+        </button>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- 2. Cash Book Add Transaction Modal -->
+  <div id="txn-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeModal('txn-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <h3 class="font-bold text-slate-900 text-base mb-4" data-i18n="add_txn_btn">Record New Transaction</h3>
+
+      <form id="txn-form" class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="th_date">Date</label>
+            <input type="date" id="txn-date" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="th_type">Type</label>
+            <select id="txn-type" onchange="populateCategoryDropdown()" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600">
+              <option value="income" data-i18n="txn_type_income">Income (வரவு)</option>
+              <option value="expense" data-i18n="txn_type_expense">Expense (செலவு)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="th_category">Category</label>
+          <select id="txn-category" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600 bg-white" required>
+            <!-- Populated dynamically via JS -->
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="th_amount">Amount (₹)</label>
+            <input type="number" id="txn-amount" step="0.5" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" required>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="th_mode">Payment Mode</label>
+            <select id="txn-payment-mode" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600">
+              <option value="Cash">Cash (ரொக்கம்)</option>
+              <option value="UPI">UPI (Google Pay / PhonePe)</option>
+              <option value="Bank Transfer">Bank Transfer (வங்கி)</option>
+              <option value="Credit">Credit / Due (கடன்)</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="th_notes">Notes / Details</label>
+          <input type="text" id="txn-notes" class="w-full text-xs border border-slate-300 rounded-lg p-2 focus:outline-emerald-600" placeholder="e.g. Weekly market sales of 25 bottles">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-xs shadow-md transition mt-2">
+          Save Record (பதிவு செய்)
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Settings / Gemini API Key Modal -->
+  <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm hidden p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+      <button onclick="closeModal('settings-modal')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center space-x-2 text-rural-700 mb-2">
+        <i class="fa-solid fa-sliders text-lg"></i>
+        <h3 class="font-bold text-slate-900 text-base">AI Configuration Settings</h3>
+      </div>
+      <p class="text-xs text-slate-500 mb-4">
+        RuralBiz AI includes a rich offline rural intelligence engine. You can also optionally connect your Google Gemini API key to enable live generative responses.
+      </p>
+
+      <form onsubmit="saveGeminiSettings(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Gemini API Key (Optional)</label>
+          <input type="password" id="settings-gemini-key" class="w-full text-xs border border-slate-300 rounded-lg p-2.5 focus:outline-emerald-600" placeholder="AIzaSy...">
+          <p class="text-[10px] text-slate-400 mt-1">Saved securely in your browser's local storage.</p>
+        </div>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-rural-700 hover:bg-rural-800 text-white font-bold text-xs shadow-md transition">
+          Save Settings
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-500 no-print">
+    <div class="max-w-7xl mx-auto px-4 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-2">
+        <span class="font-extrabold text-rural-800">RuralBiz AI</span>
+        <span>•</span>
+        <span>AI-Driven Hyper-Local Business Advisory for Rural Micro-Entrepreneurs</span>
+      </div>
+      <div>
+        <span>Built for Rural Prosperity & Financial Inclusion (தமிழ்நாடு & இந்தியா)</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Scripts -->
+  <script src="/static/js/i18n.js"></script>
+  <script src="/static/js/app.js"></script>
+
+</body>
+</html>

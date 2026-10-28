@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  ruralbiz-app:
+    build: .
+    container_name: ruralbiz_ai
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - SESSION_SECRET=production-secret-change-me
+    volumes:
+      - ruralbiz_data:/app
+    restart: always
+
+volumes:
+  ruralbiz_data:
