@@ -44,6 +44,8 @@ Desktop.ini
 $RECYCLE.BIN/
 .DS_Store
 
-# IDEs
+# Local helper scripts
+push_to_github.bat
+
 .vscode/
 .idea/
